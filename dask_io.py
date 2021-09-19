@@ -85,8 +85,9 @@ class dask_io(traitlets.HasTraits):
 
     worker_memory = traitlets.Float()
     nodes = traitlets.Int()
+    partition_size = traitlets.Int()
 
-    def cluster_calc(self, worker_memory=2, nodes=5):
+    def cluster_calc(self, worker_memory=2, nodes=5, partition_size=1):
         """Starts the computation on cluster via dask. Saves results in HDF format on the cluster and transfers it back to io.
 
         Keyword Arguments:
@@ -95,6 +96,7 @@ class dask_io(traitlets.HasTraits):
         """
         self.worker_memory = worker_memory
         self.nodes = nodes
+        self.partition_size = partition_size
 
         f = self.f
 
@@ -113,7 +115,7 @@ class dask_io(traitlets.HasTraits):
             cluster.scale(self.nodes)
             client = cluster.get_client()
             # Computation
-            baged_input = db.from_sequence(self.args)
+            baged_input = db.from_sequence(self.args, partition_size=self.partition_size)
             data = baged_input.map(wrapped_fn).to_dataframe().to_hdf(
                 self.REMOTE_PATH/self.TEMP_DATA, 'group')
             # job_list = [da.from_array(wrapped_fn(i)) for i in args]
