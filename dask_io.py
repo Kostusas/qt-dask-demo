@@ -148,7 +148,7 @@ class dask_io(traitlets.HasTraits):
                                     coords=self.params)
         else:
             xr_array = xr.DataArray(data=shaped_data,
-                                    dims=[*self.params.keys(), 'type'],
-                                    coords={**self.params, 'type': np.arange(self.N_output)})
+                                    dims=[*self.params.keys(), 'output#'],
+                                    coords={**self.params, 'output#': np.arange(self.N_output)})
         xr_array.to_netcdf(self.XR_DATA)
         return xr_array
